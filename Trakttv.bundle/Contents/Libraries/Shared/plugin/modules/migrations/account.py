@@ -143,7 +143,18 @@ class AccountMigration(Migration):
     def create_plex_basic_credential(cls, plex_account, token_plex=None):
         if token_plex is None:
             token_plex = cls.get_token()
-
+            # TODO New local token requires migration to new PMS API
+            #  Given this integration is not done, try using token already in DB if it exists
+            #  This token can be set via https://trakt-for-plex.github.io/configuration/#/configuration/accounts
+            if token_plex.startswith("local-"):
+                try:
+                    existing_account = PlexBasicCredential.get(account=plex_account)
+                except (apsw.ConstraintError, peewee.IntegrityError) as ex:
+                    pass
+                else:
+                    existing_token_plex = existing_account.token_plex
+                    if existing_token_plex and not existing_token_plex.startswith("local-"):
+                        token_plex = existing_token_plex
         if not token_plex:
             log.warn('No plex token available, unable to authenticate plex account')
             return False
