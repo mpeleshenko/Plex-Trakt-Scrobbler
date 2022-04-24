@@ -183,6 +183,10 @@ class LibraryBase(object):
             if not value:
                 return None
 
+            if isinstance(value, int):
+                value = datetime.fromtimestamp(value)
+                return value
+
             if not isinstance(value, datetime):
                 log.debug('Invalid value provided for DateTimeField: %r (expected datetime instance)', value)
                 return None
