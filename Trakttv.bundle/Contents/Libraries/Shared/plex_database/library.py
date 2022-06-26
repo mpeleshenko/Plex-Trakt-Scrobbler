@@ -184,7 +184,7 @@ class LibraryBase(object):
                 return None
 
             if isinstance(value, int):
-                value = datetime.fromtimestamp(value)
+                value = datetime.fromtimestamp(value, pytz.utc)
                 return value
 
             if not isinstance(value, datetime):
